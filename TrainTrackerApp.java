@@ -604,17 +604,17 @@ class AddTrainDialog extends JDialog {
 
     private JPanel card(String title) {
         JPanel p = new JPanel(new BorderLayout(0, 6));
-        p.setBackground(CARD_BG);
+        p.setOpaque(false);
         p.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(60, 60, 80)),
-                BorderFactory.createEmptyBorder(10, 12, 10, 12)));
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         JLabel t = new JLabel(title);
         t.setForeground(MUTED);
         t.setFont(new Font("Monospaced", Font.PLAIN, 11));
         t.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         p.add(t, BorderLayout.NORTH);
         JPanel body = new JPanel();
-        body.setBackground(CARD_BG);
+        body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         p.add(body, BorderLayout.CENTER);
         p.putClientProperty("body", body);
@@ -851,9 +851,25 @@ public class Hello extends JFrame {
         center.add(top, BorderLayout.NORTH);
 
         JPanel cards = new JPanel(new GridLayout(1, 2, 10, 0));
-        cards.setBackground(DARK_BG);
-        cards.add(buildDetailsCard());
-        cards.add(buildLiveCard());
+        cards.setBackground(DARK_BG); // Overall container remains dark
+
+        // Train Details Card (left) with preview1.png
+        JPanel detailsCard = buildDetailsCard();
+        // At this point, detailsCard and all its children are transparent
+        BackgroundPanel detailsBg = new BackgroundPanel("preview1.png");
+        detailsBg.setBackground(CARD_BG); // Solid gray background
+        detailsBg.setLayout(new BorderLayout());
+        detailsBg.add(detailsCard, BorderLayout.CENTER);
+        cards.add(detailsBg);
+
+        // Live Status Card (right) with preview2.png
+        JPanel liveCard = buildLiveCard();
+        BackgroundPanel liveBg = new BackgroundPanel("preview2.png");
+        liveBg.setBackground(CARD_BG); // Solid gray background
+        liveBg.setLayout(new BorderLayout());
+        liveBg.add(liveCard, BorderLayout.CENTER);
+        cards.add(liveBg);
+
         center.add(cards, BorderLayout.CENTER);
 
         JPanel bottom = new JPanel(new BorderLayout(0, 6));
@@ -1044,7 +1060,7 @@ public class Hello extends JFrame {
 
     private JPanel card(String title) {
         JPanel p = new JPanel(new BorderLayout(0, 6));
-        p.setBackground(CARD_BG);
+        p.setOpaque(false); // <--- FIXED: Makes the card transparent
         p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(60, 60, 80)),
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         JLabel t = new JLabel(title);
@@ -1053,7 +1069,7 @@ public class Hello extends JFrame {
         t.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         p.add(t, BorderLayout.NORTH);
         JPanel body = new JPanel();
-        body.setBackground(CARD_BG);
+        body.setOpaque(false); // <--- FIXED: Makes the body transparent
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         p.add(body, BorderLayout.CENTER);
         p.putClientProperty("body", body);
@@ -1063,7 +1079,7 @@ public class Hello extends JFrame {
     private void addRow(JPanel card, String labelText, JLabel valueLabel) {
         JPanel body = (JPanel) card.getClientProperty("body");
         JPanel row = new JPanel(new BorderLayout());
-        row.setBackground(CARD_BG);
+        row.setOpaque(false);
         row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(50, 50, 70)));
         JLabel lbl = lbl(labelText, TEXT_MUTED, 12);
         lbl.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 8));
@@ -1115,5 +1131,32 @@ public class Hello extends JFrame {
             app.setLocationRelativeTo(null);
             app.setVisible(true);
         });
+    }
+}
+
+// Custom Panel to draw a faint background image
+class BackgroundPanel extends JPanel {
+    private Image img;
+
+    public BackgroundPanel(String path) {
+        setOpaque(true); // Required to draw the solid CARD_BG background color
+        try {
+            img = javax.imageio.ImageIO.read(new File(path));
+        } catch (Exception e) {
+            // Silently fail if image cannot be loaded
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g); // Draws the solid CARD_BG color first
+        if (img != null) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            // Faint centered watermark effect (~20% opacity)
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
+            int size = Math.min(getWidth(), getHeight()) - 50;
+            g2d.drawImage(img, (getWidth() - size) / 2, (getHeight() - size) / 2, size, size, this);
+            g2d.dispose();
+        }
     }
 }
