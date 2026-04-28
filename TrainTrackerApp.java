@@ -721,7 +721,7 @@ public class hello extends JFrame {
     }
 
     private void buildUI() {
-        setSize(820, 640);
+        setSize(820, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         getContentPane().setBackground(DARK_BG);
