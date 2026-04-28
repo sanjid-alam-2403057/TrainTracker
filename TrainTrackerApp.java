@@ -370,6 +370,38 @@ class RouteProgressPanel extends JPanel {
     }
 }
 
+class LoginDialog extends JDialog {
+    private JPasswordField passwordField;
+    private boolean authenticated = false;
+
+    LoginDialog(Frame owner) {
+        super(owner, "Admin Login", true);
+        setLayout(new FlowLayout());
+        add(new JLabel("Enter Admin Password:"));
+        passwordField = new JPasswordField(15);
+        add(passwordField);
+
+        JButton btnLogin = new JButton("Login");
+        btnLogin.addActionListener(e -> {
+            String password = new String(passwordField.getPassword());
+            if (password.equals("admin123")) { // Set your password here
+                authenticated = true;
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid Password!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        add(btnLogin);
+
+        setSize(300, 120);
+        setLocationRelativeTo(owner);
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+}
+
 // ─────────────────────────────────────────────
 // ADD TRAIN DIALOG
 // ─────────────────────────────────────────────
@@ -402,13 +434,14 @@ class AddTrainDialog extends JDialog {
     }
 
     private JPanel buildHeader() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 10));
+        JPanel p = new JPanel(new BorderLayout());
         p.setBackground(DARK_RED);
-        JLabel t = new JLabel("\uD83D\uDE86  Add New Train");
-        t.setForeground(Color.WHITE);
-        t.setFont(new Font("Monospaced", Font.BOLD, 15));
-        p.add(t);
-        return p;
+        p.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+        JLabel title = new JLabel("\uD83D\uDE86  Bangladesh Train Tracker");
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Monospaced", Font.BOLD, 18));
+        p.add(title, BorderLayout.WEST);
+        return p; // ← no login button here
     }
 
     private JPanel buildForm() {
@@ -658,8 +691,10 @@ class AddTrainDialog extends JDialog {
 // ─────────────────────────────────────────────
 // Main Application
 // ─────────────────────────────────────────────
-public class hello extends JFrame {
+public class Hello extends JFrame {
 
+    private boolean isAdmin = false;
+    private JButton btnAdd, btnDel, btnLogin; // Move these to class level
     private JComboBox<Train> trainCombo;
     private JLabel lblNumber, lblName, lblCategory, lblOffDay, lblTotalDist, lblTotalStops;
     private JLabel lblStart, lblDeparture, lblDestination;
@@ -679,12 +714,13 @@ public class hello extends JFrame {
     private static final Color TEXT_MAIN = new Color(230, 230, 230);
     private static final Color TEXT_MUTED = new Color(140, 140, 160);
 
-    public hello() {
+    public Hello() {
         super("Bangladesh Train Tracker");
         loadTrains();
         buildUI();
         startLiveClock();
         trainCombo.setSelectedIndex(0);
+        updateAdminControls();
     }
 
     // Load from file; if no file yet, write defaults and use them
@@ -734,14 +770,30 @@ public class hello extends JFrame {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(DARK_RED);
         p.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+
         JLabel title = new JLabel("\uD83D\uDE86  Bangladesh Train Tracker");
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Monospaced", Font.BOLD, 18));
         p.add(title, BorderLayout.WEST);
+
+        // Right side panel with clock + login button
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        rightPanel.setOpaque(false);
+
         lblClock = new JLabel("--:--:--");
         lblClock.setForeground(new Color(255, 220, 220));
         lblClock.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        p.add(lblClock, BorderLayout.EAST);
+
+        btnLogin = new JButton("Admin Login"); // ← initialize here
+        btnLogin.setFont(new Font("Monospaced", Font.BOLD, 12));
+        btnLogin.setFocusPainted(false);
+        btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnLogin.addActionListener(e -> handleLoginLogout()); // ← wire up handler
+
+        rightPanel.add(lblClock);
+        rightPanel.add(btnLogin);
+        p.add(rightPanel, BorderLayout.EAST);
+
         return p;
     }
 
@@ -762,7 +814,7 @@ public class hello extends JFrame {
         trainCombo.setPreferredSize(new Dimension(240, 30));
         trainCombo.addActionListener(e -> refresh());
 
-        JButton btnAdd = new JButton("+ Add Train");
+        btnAdd = new JButton("+ Add Train");
         btnAdd.setBackground(DARK_RED);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Monospaced", Font.BOLD, 12));
@@ -771,7 +823,7 @@ public class hello extends JFrame {
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnAdd.addActionListener(e -> openAddTrainDialog());
 
-        JButton btnDel = new JButton("X Delete");
+        btnDel = new JButton("X Delete");
         btnDel.setBackground(new Color(50, 50, 66));
         btnDel.setForeground(new Color(220, 80, 80));
         btnDel.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -911,12 +963,33 @@ public class hello extends JFrame {
         return p;
     }
 
+    private void updateAdminControls() {
+        btnAdd.setVisible(isAdmin);
+        btnDel.setVisible(isAdmin);
+        btnLogin.setText(isAdmin ? "Logout" : "Admin Login");
+    }
+
+    private void handleLoginLogout() {
+        if (isAdmin) {
+            isAdmin = false;
+            JOptionPane.showMessageDialog(this, "Logged out successfully.");
+        } else {
+            LoginDialog dlg = new LoginDialog(this);
+            dlg.setVisible(true);
+            if (dlg.isAuthenticated()) {
+                isAdmin = true;
+                JOptionPane.showMessageDialog(this, "Admin access granted.");
+            }
+        }
+        updateAdminControls();
+    }
+
     private void refresh() {
         Train t = (Train) trainCombo.getSelectedItem();
         if (t == null)
             return;
         LocalTime now = LocalTime.now();
-        int nowMin = now.getHour() * 60 + now.getMinute() + now.getSecond() / 60;
+        int nowMin = now.getHour() * 60 + now.getMinute();
         String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         boolean isOff = today.equalsIgnoreCase(t.offDay);
         offDayBanner.setVisible(isOff);
@@ -1033,9 +1106,12 @@ public class hello extends JFrame {
         return l;
     }
 
+    // =========================
+    // FIX 4: main method
+    // =========================
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            hello app = new hello();
+            Hello app = new Hello();
             app.setLocationRelativeTo(null);
             app.setVisible(true);
         });
