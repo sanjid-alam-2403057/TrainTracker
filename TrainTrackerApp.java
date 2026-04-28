@@ -716,6 +716,12 @@ public class Hello extends JFrame {
 
     public Hello() {
         super("Bangladesh Train Tracker");
+        try {
+            Image icon = javax.imageio.ImageIO.read(new File("preview2.png"));
+            this.setIconImage(icon);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         loadTrains();
         buildUI();
         startLiveClock();
