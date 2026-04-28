@@ -332,7 +332,7 @@ class RouteProgressPanel extends JPanel {
         g.setColor(new Color(255, 215, 0));
         g.fillRoundRect(trackX, trackY, (int) (trackW * visualPct), trackH, trackH, trackH);
 
-        g.setFont(new Font("Monospaced", Font.PLAIN, 9));
+        g.setFont(new Font("Roboto", Font.PLAIN, 9));
 
         // Draw Station Dots & Names
         for (int i = 0; i < stops; i++) {
@@ -357,7 +357,7 @@ class RouteProgressPanel extends JPanel {
         g.fillPolygon(new int[] { tx - 6, tx + 6, tx }, new int[] { trackY - 12, trackY - 12, trackY - 4 }, 3);
 
         // Draw Legend
-        g.setFont(new Font("Monospaced", Font.PLAIN, 10));
+        g.setFont(new Font("Roboto", Font.PLAIN, 10));
         int[][] lc = { { 34, 197, 94 }, { 220, 50, 50 }, { 255, 215, 0 } };
         String[] ll = { "Passed", "Upcoming", "Current" };
         int llx = getWidth() - 205, lly = getHeight() - 8;
@@ -412,7 +412,7 @@ class AddTrainDialog extends JDialog {
     private static final Color DARK_RED = new Color(139, 0, 0);
     private static final Color TEXT = new Color(230, 230, 230);
     private static final Color MUTED = new Color(140, 140, 160);
-    private static final Font MONO = new Font("Monospaced", Font.PLAIN, 13);
+    private static final Font MONO = new Font("Roboto", Font.PLAIN, 13);
 
     private JTextField fNumber, fName, fStart, fDest, fDist, fSpeed;
     private JComboBox<String> cbOffDay;
@@ -439,7 +439,7 @@ class AddTrainDialog extends JDialog {
         p.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
         JLabel title = new JLabel("\uD83D\uDE86  Bangladesh Train Tracker");
         title.setForeground(Color.WHITE);
-        title.setFont(new Font("Monospaced", Font.BOLD, 18));
+        title.setFont(new Font("Roboto", Font.BOLD, 18));
         p.add(title, BorderLayout.WEST);
         return p; // ← no login button here
     }
@@ -610,7 +610,7 @@ class AddTrainDialog extends JDialog {
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         JLabel t = new JLabel(title);
         t.setForeground(MUTED);
-        t.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        t.setFont(new Font("Roboto", Font.PLAIN, 11));
         t.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         p.add(t, BorderLayout.NORTH);
         JPanel body = new JPanel();
@@ -635,7 +635,7 @@ class AddTrainDialog extends JDialog {
     private JLabel lbl(String text) {
         JLabel l = new JLabel(text);
         l.setForeground(MUTED);
-        l.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        l.setFont(new Font("Roboto", Font.PLAIN, 12));
         return l;
     }
 
@@ -643,7 +643,7 @@ class AddTrainDialog extends JDialog {
         JButton b = new JButton(text);
         b.setBackground(new Color(50, 50, 66));
         b.setForeground(TEXT);
-        b.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        b.setFont(new Font("Roboto", Font.PLAIN, 12));
         b.setFocusPainted(false);
         b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(80, 80, 100)),
                 BorderFactory.createEmptyBorder(5, 12, 5, 12)));
@@ -655,7 +655,7 @@ class AddTrainDialog extends JDialog {
         JButton b = new JButton(text);
         b.setBackground(DARK_RED);
         b.setForeground(Color.WHITE);
-        b.setFont(new Font("Monospaced", Font.BOLD, 13));
+        b.setFont(new Font("Roboto", Font.BOLD, 13));
         b.setFocusPainted(false);
         b.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -671,14 +671,14 @@ class AddTrainDialog extends JDialog {
     private void styleTable(JTable t) {
         t.setBackground(CARD_BG);
         t.setForeground(TEXT);
-        t.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        t.setFont(new Font("Roboto", Font.PLAIN, 12));
         t.setGridColor(new Color(60, 60, 80));
         t.setRowHeight(24);
         t.setSelectionBackground(new Color(80, 40, 40));
         t.setSelectionForeground(Color.WHITE);
         t.getTableHeader().setBackground(new Color(50, 50, 66));
         t.getTableHeader().setForeground(MUTED);
-        t.getTableHeader().setFont(new Font("Monospaced", Font.PLAIN, 11));
+        t.getTableHeader().setFont(new Font("Roboto", Font.PLAIN, 11));
         t.getColumnModel().getColumn(0).setMaxWidth(30);
         t.getColumnModel().getColumn(2).setMaxWidth(80);
     }
@@ -773,7 +773,7 @@ public class Hello extends JFrame {
 
         JLabel title = new JLabel("\uD83D\uDE86  Bangladesh Train Tracker");
         title.setForeground(Color.WHITE);
-        title.setFont(new Font("Monospaced", Font.BOLD, 18));
+        title.setFont(new Font("Roboto", Font.BOLD, 18));
         p.add(title, BorderLayout.WEST);
 
         // Right side panel with clock + login button
@@ -782,10 +782,10 @@ public class Hello extends JFrame {
 
         lblClock = new JLabel("--:--:--");
         lblClock.setForeground(new Color(255, 220, 220));
-        lblClock.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        lblClock.setFont(new Font("Roboto", Font.PLAIN, 13));
 
         btnLogin = new JButton("Admin Login"); // ← initialize here
-        btnLogin.setFont(new Font("Monospaced", Font.BOLD, 12));
+        btnLogin.setFont(new Font("Roboto", Font.BOLD, 12));
         btnLogin.setFocusPainted(false);
         btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnLogin.addActionListener(e -> handleLoginLogout()); // ← wire up handler
@@ -810,14 +810,14 @@ public class Hello extends JFrame {
         trainCombo = new JComboBox<>(trains.toArray(new Train[0]));
         trainCombo.setBackground(CARD_BG);
         trainCombo.setForeground(TEXT_MAIN);
-        trainCombo.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        trainCombo.setFont(new Font("Roboto", Font.PLAIN, 13));
         trainCombo.setPreferredSize(new Dimension(240, 30));
         trainCombo.addActionListener(e -> refresh());
 
         btnAdd = new JButton("+ Add Train");
         btnAdd.setBackground(DARK_RED);
         btnAdd.setForeground(Color.WHITE);
-        btnAdd.setFont(new Font("Monospaced", Font.BOLD, 12));
+        btnAdd.setFont(new Font("Roboto", Font.BOLD, 12));
         btnAdd.setFocusPainted(false);
         btnAdd.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -826,7 +826,7 @@ public class Hello extends JFrame {
         btnDel = new JButton("X Delete");
         btnDel.setBackground(new Color(50, 50, 66));
         btnDel.setForeground(new Color(220, 80, 80));
-        btnDel.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        btnDel.setFont(new Font("Roboto", Font.PLAIN, 12));
         btnDel.setFocusPainted(false);
         btnDel.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
         btnDel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -842,7 +842,7 @@ public class Hello extends JFrame {
         offDayBanner.setBorder(BorderFactory.createLineBorder(new Color(180, 60, 60)));
         offDayMsg = new JLabel("");
         offDayMsg.setForeground(new Color(255, 180, 180));
-        offDayMsg.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        offDayMsg.setFont(new Font("Roboto", Font.PLAIN, 12));
         offDayBanner.add(offDayMsg);
         offDayBanner.setVisible(false);
 
@@ -970,11 +970,11 @@ public class Hello extends JFrame {
         p.setBorder(BorderFactory.createEmptyBorder(5, 14, 5, 14));
         lblStatus = new JLabel("");
         lblStatus.setForeground(TEXT_MUTED);
-        lblStatus.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        lblStatus.setFont(new Font("Roboto", Font.PLAIN, 12));
         p.add(lblStatus, BorderLayout.WEST);
         JLabel copy = new JLabel("Copyright 2026, CSE RUET");
         copy.setForeground(TEXT_MUTED);
-        copy.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        copy.setFont(new Font("Roboto", Font.PLAIN, 11));
         p.add(copy, BorderLayout.EAST);
         return p;
     }
@@ -1065,7 +1065,7 @@ public class Hello extends JFrame {
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         JLabel t = new JLabel(title);
         t.setForeground(TEXT_MUTED);
-        t.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        t.setFont(new Font("Roboto", Font.PLAIN, 11));
         t.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         p.add(t, BorderLayout.NORTH);
         JPanel body = new JPanel();
@@ -1103,7 +1103,7 @@ public class Hello extends JFrame {
     private JLabel infoLabel() {
         JLabel l = new JLabel("--");
         l.setForeground(TEXT_MAIN);
-        l.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        l.setFont(new Font("Roboto", Font.PLAIN, 13));
         l.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         return l;
     }
@@ -1111,14 +1111,14 @@ public class Hello extends JFrame {
     private JLabel statLabel() {
         JLabel l = new JLabel("--");
         l.setForeground(ACCENT);
-        l.setFont(new Font("Monospaced", Font.BOLD, 16));
+        l.setFont(new Font("Roboto", Font.BOLD, 16));
         return l;
     }
 
     private static JLabel lbl(String text, Color color, int size) {
         JLabel l = new JLabel(text);
         l.setForeground(color);
-        l.setFont(new Font("Monospaced", Font.PLAIN, size));
+        l.setFont(new Font("Roboto", Font.PLAIN, size));
         return l;
     }
 
