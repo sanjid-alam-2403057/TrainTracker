@@ -1015,8 +1015,24 @@ public class Hello extends JFrame {
         String today = LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         boolean isOff = today.equalsIgnoreCase(t.offDay);
         offDayBanner.setVisible(isOff);
-        if (isOff)
+        if (isOff) {
             offDayMsg.setText("  " + t.name + " does not operate on " + t.offDay + "s.");
+
+            // Reset all live fields to idle state
+            lblLiveETA.setText("--");
+            lblNextStation.setText("--");
+            lblNextETA.setText("--");
+            lblCovered.setText("0 km");
+            lblRemaining.setText(t.totalDistance + " km");
+            lblRemTime.setText("--");
+            lblSpeed.setText(t.avgSpeedKmh + " km/h");
+
+            routePanel.update(null, 0); // clear the route panel
+
+            
+            lblStatus.setText("Train does not operate today  |  0 km covered  |  " + t.totalDistance + " km remaining");
+            return; // ← stop here, do not compute live progress
+        }
         lblNumber.setText(t.number);
         lblName.setText(t.name);
         lblCategory.setText(t.getCategory());
