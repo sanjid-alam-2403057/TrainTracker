@@ -669,8 +669,8 @@ public class Hello extends JFrame {
     private static final Color DARK_BG = new Color(28, 28, 36);
     private static final Color CARD_BG = new Color(38, 38, 50);
     private static final Color ACCENT = new Color(255, 215, 0);
-    private static final Color TEXT_MAIN = new Color(230, 230, 230);
-    private static final Color TEXT_MUTED = new Color(140, 140, 160);
+    private static final Color TEXT_MAIN = new Color(255, 255, 255);
+    private static final Color TEXT_MUTED = new Color(255, 255, 255);
 
     public Hello() {
         super("Bangladesh Train Tracker");
