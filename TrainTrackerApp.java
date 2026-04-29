@@ -9,23 +9,14 @@ import java.time.format.*;
 import java.util.*;
 import java.util.List;
 
-// ─────────────────────────────────────────────
-//  Abstract base class
-// ─────────────────────────────────────────────
 abstract class Transport {
     abstract String getCategory();
 }
 
-// ─────────────────────────────────────────────
-// Persistable interface
-// ─────────────────────────────────────────────
 interface Persistable {
     void saveToFile();
 }
 
-// ─────────────────────────────────────────────
-// Station
-// ─────────────────────────────────────────────
 class Station {
     String name;
     String scheduledDep;
@@ -43,9 +34,6 @@ class Station {
     }
 }
 
-// ─────────────────────────────────────────────
-// Train
-// ─────────────────────────────────────────────
 class Train extends Transport implements Persistable {
 
     String number, name, start, destination, offDay;
@@ -157,7 +145,6 @@ class Train extends Transport implements Persistable {
         return "Railway";
     }
 
-    /** Logs brief activity to train_data.txt (unchanged). */
     @Override
     public void saveToFile() {
         try (BufferedWriter w = new BufferedWriter(new FileWriter("train_data.txt", true))) {
@@ -173,22 +160,10 @@ class Train extends Transport implements Persistable {
     }
 }
 
-// ─────────────────────────────────────────────
-// TrainStore – permanent CSV persistence
-//
-// File: trains.csv (same folder as the .java / .class file)
-// Format:
-// number|name|start|destination|offDay|distance|speed
-// StationName|HH:mm
-// StationName|HH:mm
-// (blank line)
-// next train...
-// ─────────────────────────────────────────────
 class TrainStore {
 
     private static final String FILE = "trains.csv";
 
-    /** Overwrite trains.csv with the current list of trains. */
     static void saveAll(List<Train> trains) {
         try (BufferedWriter w = new BufferedWriter(new FileWriter(FILE, false))) {
             for (Train t : trains) {
@@ -200,14 +175,13 @@ class TrainStore {
                     w.write(s.name + "|" + s.scheduledDep);
                     w.newLine();
                 }
-                w.newLine(); // blank line between trains
+                w.newLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /** Load all trains from trains.csv. Returns empty list if file missing. */
     static List<Train> loadAll() {
         List<Train> result = new ArrayList<>();
         File f = new File(FILE);
@@ -222,7 +196,7 @@ class TrainStore {
             while ((line = r.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty()) {
-                    // flush current train
+
                     if (header != null && stops.size() >= 2) {
                         Train t = parseHeader(header, stops);
                         if (t != null)
@@ -240,7 +214,7 @@ class TrainStore {
                         stops.add(new Station(parts[0], parts[1]));
                 }
             }
-            // handle file with no trailing blank line
+
             if (header != null && stops.size() >= 2) {
                 Train t = parseHeader(header, stops);
                 if (t != null)
@@ -266,9 +240,6 @@ class TrainStore {
     }
 }
 
-// ─────────────────────────────────────────────
-// Route Progress Panel
-// ─────────────────────────────────────────────
 class RouteProgressPanel extends JPanel {
 
     private Train train;
@@ -297,15 +268,13 @@ class RouteProgressPanel extends JPanel {
         int stops = train.totalStops();
         int ci = train.currentStopIndex(nowMin);
 
-        // --- NEW LOGIC: Calculate Visual Percentage ---
         double visualPct = 0.0;
         if (ci < 0) {
-            visualPct = 0.0; // Hasn't departed
+            visualPct = 0.0;
         } else if (ci >= stops - 1) {
-            visualPct = 1.0; // Journey complete
+            visualPct = 1.0;
         } else {
-            // Map the time progress strictly between the current and next station's X
-            // coordinates
+
             double basePos = (double) ci / (stops - 1);
             double nextPos = (double) (ci + 1) / (stops - 1);
 
@@ -314,27 +283,24 @@ class RouteProgressPanel extends JPanel {
 
             int segmentDur = timeNext - timeCi;
             if (segmentDur < 0)
-                segmentDur += 1440; // Handle midnight crossing
+                segmentDur += 1440;
 
             int timeSinceCi = nowMin - timeCi;
             if (timeSinceCi < 0)
-                timeSinceCi += 1440; // Handle midnight crossing
+                timeSinceCi += 1440;
 
             double segmentProgress = (segmentDur == 0) ? 1.0 : (double) timeSinceCi / segmentDur;
             visualPct = basePos + (segmentProgress * (nextPos - basePos));
         }
 
-        // Draw background track
         g.setColor(new Color(80, 80, 80));
         g.fillRoundRect(trackX, trackY, trackW, trackH, trackH, trackH);
 
-        // Draw progress track using the new visualPct
         g.setColor(new Color(255, 215, 0));
         g.fillRoundRect(trackX, trackY, (int) (trackW * visualPct), trackH, trackH, trackH);
 
         g.setFont(new Font("Roboto", Font.PLAIN, 9));
 
-        // Draw Station Dots & Names
         for (int i = 0; i < stops; i++) {
             double pos = (stops == 1) ? 0 : (double) i / (stops - 1);
             int cx = trackX + (int) (pos * trackW), cy = trackY + trackH / 2, r = 7;
@@ -351,12 +317,10 @@ class RouteProgressPanel extends JPanel {
             g.drawString(lbl, cx - fm.stringWidth(lbl) / 2, trackY + trackH + 18);
         }
 
-        // Draw Triangle Marker based on the new visualPct
         int tx = trackX + (int) (trackW * visualPct);
         g.setColor(new Color(255, 215, 0));
         g.fillPolygon(new int[] { tx - 6, tx + 6, tx }, new int[] { trackY - 12, trackY - 12, trackY - 4 }, 3);
 
-        // Draw Legend
         g.setFont(new Font("Roboto", Font.PLAIN, 10));
         int[][] lc = { { 34, 197, 94 }, { 220, 50, 50 }, { 255, 215, 0 } };
         String[] ll = { "Passed", "Upcoming", "Current" };
@@ -384,7 +348,7 @@ class LoginDialog extends JDialog {
         JButton btnLogin = new JButton("Login");
         btnLogin.addActionListener(e -> {
             String password = new String(passwordField.getPassword());
-            if (password.equals("admin123")) { // Set your password here
+            if (password.equals("admin123")) {
                 authenticated = true;
                 dispose();
             } else {
@@ -402,9 +366,6 @@ class LoginDialog extends JDialog {
     }
 }
 
-// ─────────────────────────────────────────────
-// ADD TRAIN DIALOG
-// ─────────────────────────────────────────────
 class AddTrainDialog extends JDialog {
 
     private static final Color DARK_BG = new Color(28, 28, 36);
@@ -441,7 +402,7 @@ class AddTrainDialog extends JDialog {
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Roboto", Font.BOLD, 18));
         p.add(title, BorderLayout.WEST);
-        return p; // ← no login button here
+        return p;
     }
 
     private JPanel buildForm() {
@@ -486,7 +447,7 @@ class AddTrainDialog extends JDialog {
         fStopTime = field();
         fStopTime.setPreferredSize(new Dimension(80, 28));
         fStopTime.setToolTipText("Format: HH:mm  e.g. 07:40");
-        // Enter on name -> move to time; Enter on time -> add stop
+
         fStopName.addActionListener(e -> fStopTime.requestFocus());
         fStopTime.addActionListener(e -> addStop());
 
@@ -688,13 +649,10 @@ class AddTrainDialog extends JDialog {
     }
 }
 
-// ─────────────────────────────────────────────
-// Main Application
-// ─────────────────────────────────────────────
 public class Hello extends JFrame {
 
     private boolean isAdmin = false;
-    private JButton btnAdd, btnDel, btnLogin; // Move these to class level
+    private JButton btnAdd, btnDel, btnLogin;
     private JComboBox<Train> trainCombo;
     private JLabel lblNumber, lblName, lblCategory, lblOffDay, lblTotalDist, lblTotalStops;
     private JLabel lblStart, lblDeparture, lblDestination;
@@ -729,7 +687,6 @@ public class Hello extends JFrame {
         updateAdminControls();
     }
 
-    // Load from file; if no file yet, write defaults and use them
     private void loadTrains() {
         trains = TrainStore.loadAll();
         if (trains.isEmpty()) {
@@ -758,7 +715,7 @@ public class Hello extends JFrame {
                             new Station("Brahmanbaria", "08:40"), new Station("Akhaura", "09:05"),
                             new Station("Comilla", "09:45"), new Station("Laksham", "10:20"),
                             new Station("Feni", "11:00"), new Station("Chittagong", "12:30")))));
-            TrainStore.saveAll(trains); // create trains.csv on first run
+            TrainStore.saveAll(trains);
         }
     }
 
@@ -782,7 +739,6 @@ public class Hello extends JFrame {
         title.setFont(new Font("Roboto", Font.BOLD, 18));
         p.add(title, BorderLayout.WEST);
 
-        // Right side panel with clock + login button
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         rightPanel.setOpaque(false);
 
@@ -790,11 +746,11 @@ public class Hello extends JFrame {
         lblClock.setForeground(new Color(255, 220, 220));
         lblClock.setFont(new Font("Roboto", Font.PLAIN, 13));
 
-        btnLogin = new JButton("Admin Login"); // ← initialize here
+        btnLogin = new JButton("Admin Login");
         btnLogin.setFont(new Font("Roboto", Font.BOLD, 12));
         btnLogin.setFocusPainted(false);
         btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnLogin.addActionListener(e -> handleLoginLogout()); // ← wire up handler
+        btnLogin.addActionListener(e -> handleLoginLogout());
 
         rightPanel.add(lblClock);
         rightPanel.add(btnLogin);
@@ -857,21 +813,19 @@ public class Hello extends JFrame {
         center.add(top, BorderLayout.NORTH);
 
         JPanel cards = new JPanel(new GridLayout(1, 2, 10, 0));
-        cards.setBackground(DARK_BG); // Overall container remains dark
+        cards.setBackground(DARK_BG);
 
-        // Train Details Card (left) with preview1.png
         JPanel detailsCard = buildDetailsCard();
-        // At this point, detailsCard and all its children are transparent
+
         BackgroundPanel detailsBg = new BackgroundPanel("preview1.png");
-        detailsBg.setBackground(CARD_BG); // Solid gray background
+        detailsBg.setBackground(CARD_BG);
         detailsBg.setLayout(new BorderLayout());
         detailsBg.add(detailsCard, BorderLayout.CENTER);
         cards.add(detailsBg);
 
-        // Live Status Card (right) with preview2.png
         JPanel liveCard = buildLiveCard();
         BackgroundPanel liveBg = new BackgroundPanel("preview2.png");
-        liveBg.setBackground(CARD_BG); // Solid gray background
+        liveBg.setBackground(CARD_BG);
         liveBg.setLayout(new BorderLayout());
         liveBg.add(liveCard, BorderLayout.CENTER);
         cards.add(liveBg);
@@ -896,7 +850,7 @@ public class Hello extends JFrame {
         Train t = dlg.getResult();
         if (t != null) {
             trains.add(t);
-            TrainStore.saveAll(trains); // save to disk immediately
+            TrainStore.saveAll(trains);
             trainCombo.addItem(t);
             trainCombo.setSelectedItem(t);
             JOptionPane.showMessageDialog(this, "  " + t.name + " added and saved permanently!", "Train Added",
@@ -913,7 +867,7 @@ public class Hello extends JFrame {
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirm == JOptionPane.YES_OPTION) {
             trains.remove(t);
-            TrainStore.saveAll(trains); // save to disk immediately
+            TrainStore.saveAll(trains);
             trainCombo.removeItem(t);
         }
     }
@@ -1018,7 +972,6 @@ public class Hello extends JFrame {
         if (isOff) {
             offDayMsg.setText("  " + t.name + " does not operate on " + t.offDay + "s.");
 
-            // Reset all live fields to idle state
             lblLiveETA.setText("--");
             lblNextStation.setText("--");
             lblNextETA.setText("--");
@@ -1027,11 +980,10 @@ public class Hello extends JFrame {
             lblRemTime.setText("--");
             lblSpeed.setText(t.avgSpeedKmh + " km/h");
 
-            routePanel.update(null, 0); // clear the route panel
+            routePanel.update(null, 0);
 
-            
             lblStatus.setText("Train does not operate today  |  0 km covered  |  " + t.totalDistance + " km remaining");
-            return; // ← stop here, do not compute live progress
+            return;
         }
         lblNumber.setText(t.number);
         lblName.setText(t.name);
@@ -1082,7 +1034,7 @@ public class Hello extends JFrame {
 
     private JPanel card(String title) {
         JPanel p = new JPanel(new BorderLayout(0, 6));
-        p.setOpaque(false); // <--- FIXED: Makes the card transparent
+        p.setOpaque(false);
         p.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(60, 60, 80)),
                 BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         JLabel t = new JLabel(title);
@@ -1091,7 +1043,7 @@ public class Hello extends JFrame {
         t.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
         p.add(t, BorderLayout.NORTH);
         JPanel body = new JPanel();
-        body.setOpaque(false); // <--- FIXED: Makes the body transparent
+        body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         p.add(body, BorderLayout.CENTER);
         p.putClientProperty("body", body);
@@ -1144,9 +1096,6 @@ public class Hello extends JFrame {
         return l;
     }
 
-    // =========================
-    // FIX 4: main method
-    // =========================
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             Hello app = new Hello();
@@ -1156,25 +1105,23 @@ public class Hello extends JFrame {
     }
 }
 
-// Custom Panel to draw a faint background image
 class BackgroundPanel extends JPanel {
     private Image img;
 
     public BackgroundPanel(String path) {
-        setOpaque(true); // Required to draw the solid CARD_BG background color
+        setOpaque(true);
         try {
             img = javax.imageio.ImageIO.read(new File(path));
         } catch (Exception e) {
-            // Silently fail if image cannot be loaded
+
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Draws the solid CARD_BG color first
+        super.paintComponent(g);
         if (img != null) {
             Graphics2D g2d = (Graphics2D) g.create();
-            // Faint centered watermark effect (~20% opacity)
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
             int size = Math.min(getWidth(), getHeight()) - 50;
             g2d.drawImage(img, (getWidth() - size) / 2, (getHeight() - size) / 2, size, size, this);
